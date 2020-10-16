@@ -1,0 +1,5 @@
+---
+applications:
+ - name: upkar2020-movies-reviews-database
+   random-route: true
+   memory: 128M

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Movies Review Database</title>
+    <link href="css/bulma.min.css" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <nav class="navbar is-info" role="navigation" aria-label="main navigation">
+      <div class="navbar-menu is-active">
+        <div class="navbar-start">
+          <!-- navbar items --><a class="navbar-item" href="/"> Home </a>
+          <a class="navbar-item" href="/reviews"> Reviews </a>
+        </div>
+      </div>
+      <div class="navbar-menu is-active">
+        <!-- shown on mobile -->
+      </div>
+    </nav>
+
+    <section class="section">
+      <div class="container is-fluid">
+        <h1 class="is-size-1 p-6">Current Reviews</h1>
+
+        <% result.forEach(function(review){ %>
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+              <% if(review.doc.sentiment === 'positive') {%>
+                <article class="tile is-child box notification is-primary">
+              <% } else if(review.doc.sentiment === 'negative') {%>
+                <article class="tile is-child box notification is-warning">
+              <% } else { %>
+                <article class="tile is-child box">
+              <% } %>
+              <p class="title"><%= review.doc.movie %></p>
+              <p class="subtitle">
+                <%= review.doc.firstName %> <%= review.doc.lastName %>
+              </p>
+              <div class="content">
+                <!-- Content -->
+                <%= review.doc.review %>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <% }) %>
+      </div>
+    </section>
+    <footer class="footer">
+      <div class="container">
+        <div class="content has-text-centered">
+          <p>
+            <strong>Movies Review Database</strong> by
+            <a href="https://jgthms.com">Course Name</a>. The source code is
+            licensed
+            <a href="http://opensource.org/licenses/mit-license.php">MIT</a>.
+            The website content is licensed
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+              >CC BY NC SA 4.0</a
+            >.
+          </p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
