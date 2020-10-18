@@ -16,7 +16,8 @@ const dbName = 'movies-reviews';
 
 if (isCloudantAvaliable) {
   var Cloudant = require('@cloudant/cloudant');
-  cloudant = Cloudant(process.env.CLOUDANT_URL);
+  // use IAM here
+  cloudant = Cloudant({ url: process.env.CLOUDANT_URL, plugins: { iamauth: { iamApiKey: process.env.CLOUDANT_API} } });
 }
 
 if (isNLUAvailable) {
