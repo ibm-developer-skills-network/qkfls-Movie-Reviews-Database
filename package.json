@@ -17,10 +17,12 @@
   "dependencies": {
     "@cloudant/cloudant": "^3.0.2",
     "body-parser": "^1.17.x",
+    "cfenv": "^1.2.3",
     "dotenv": "^4.0.0",
     "ejs": "^3.1.5",
     "express": "^4.15.x",
-    "ibm-watson": "^5.7.1"
+    "ibm-watson": "^5.7.1",
+    "nodemon": "^2.0.6"
   },
   "author": "IBM Corp",
   "license": "Apache-2.0"

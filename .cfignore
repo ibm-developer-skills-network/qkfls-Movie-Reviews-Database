@@ -6,3 +6,5 @@ README.md
 .gitignore
 logs
 *.log
+.env
+.vcap-local

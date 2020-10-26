@@ -1,21 +1,16 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Movies Review Database</title>
-    <link href="css/bulma.min.css" rel="stylesheet" />
-    <link href="css/styles.css" rel="stylesheet" />
+    <%- include('head', {title: 'Movie Database - Index'}); %>
   </head>
 
   <body>
     <nav class="navbar is-info" role="navigation" aria-label="main navigation">
       <div class="navbar-menu is-active">
         <div class="navbar-start">
-            <!-- navbar items --><a class="navbar-item" href="/"> Home </a>
-            <a class="navbar-item"  href="/reviews"> Reviews </a>
-          </div>
+          <!-- navbar items --><a class="navbar-item" href="/"> Home </a>
+          <a class="navbar-item" href="/reviews"> Reviews </a>
+        </div>
       </div>
       <div class="navbar-menu is-active">
         <!-- shown on mobile -->
@@ -24,18 +19,41 @@
 
     <section class="section">
       <div class="container is-fluid">
+        <% if (msg.errors) { %>
+        <div class="content">
+          <h1 style="color: red">Errors:</h1>
+          <ol type="1">
+            <% msg.errors.forEach(function(error){ %>
+            <li style="color: red"><%= error %></li>
+            <%});%>
+          </ol>
+        </div>
+        <form action="" method="POST">
+
+        <%} else {%>
         <form action="/reviews" method="POST">
+          <% } %>
           <div class="field">
             <label class="label">First Name</label>
             <div class="control">
-              <input class="input" type="text" id="first_name" name="first_name"/>
+              <input
+                class="input"
+                type="text"
+                id="first_name"
+                name="first_name"
+              />
             </div>
           </div>
 
           <div class="field">
             <label class="label">Last Name</label>
             <div class="control">
-              <input class="input" type="text" id="last_name" name="last_name" />
+              <input
+                class="input"
+                type="text"
+                id="last_name"
+                name="last_name"
+              />
             </div>
           </div>
 
@@ -58,7 +76,7 @@
           <div class="field">
             <label class="label">Review</label>
             <div class="control">
-              <textarea 
+              <textarea
                 class="textarea"
                 placeholder="Enter your review here ..."
                 id="review"
@@ -66,30 +84,16 @@
               ></textarea>
             </div>
           </div>
-
+          <% if (!msg.errors) { %>
           <div class="field is-grouped">
             <div class="control">
               <button class="button is-link" type="submit">Submit</button>
             </div>
           </div>
+          <%}%>
         </form>
       </div>
     </section>
-    <footer class="footer">
-      <div class="container">
-        <div class="content has-text-centered">
-          <p>
-            <strong>Movies Review Database</strong> by
-            <a href="https://jgthms.com">Course Name</a>. The source code is
-            licensed
-            <a href="http://opensource.org/licenses/mit-license.php">MIT</a>.
-            The website content is licensed
-            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
-              >CC BY NC SA 4.0</a
-            >.
-          </p>
-        </div>
-      </div>
-    </footer>
+    <%- include('footer'); %>
   </body>
 </html>
