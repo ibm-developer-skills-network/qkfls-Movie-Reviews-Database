@@ -79,9 +79,9 @@ app.get('/', function (req, res, next) {
   // show error if nlu or cloudant credentials are not present
   errors = checkServiceCredentials();
   if (errors && errors.length > 0) {
-    res.render('index', { msg: { errors: errors } });
+    res.render('index.ejs', { msg: { errors: errors } });
   } else {
-    res.render('index', { msg: {} });
+    res.render('index.ejs', { msg: {} });
   }
 });
 
@@ -92,10 +92,14 @@ app.get("/reviews", function (request, response) {
   var errors = checkServiceCredentials();
 
   if (errors && errors.length > 0) {
-    response.render('reviews', { msg: { errors: errors } })
+    response.render('reviews.ejs', { msg: { errors: errors } })
   } else {
     moviesDb.list({ include_docs: true }, function (err, body) {
-      response.render('reviews', { msg: { result: body.rows } });
+      if (err) {
+        response.render('reviews.ejs', { msg: { errors: [strings.CLOUDANT_ERROR + " " + err.message] } })
+      } else {
+        response.render('reviews.ejs', { msg: { result: body.rows } });
+      }
     })
   }
 });
@@ -115,7 +119,7 @@ app.post("/reviews", function (request, response) {
   }
 
   if (errors && errors.length > 0) {
-    response.render('reviews', { msg: { errors: errors } })
+    response.render('reviews.ejs', { msg: { errors: errors } })
   } else {
 
     var doc = {
@@ -147,7 +151,7 @@ app.post("/reviews", function (request, response) {
       })
       .catch(err => {
         console.log('error:', err);
-        response.render('reviews', { msg: { errors: [strings.NLU_NOT_ENOUGH_TEXT] } })
+        response.render('reviews.ejs', { msg: { errors: [strings.NLU_NOT_ENOUGH_TEXT] } })
       });
   }
 });
@@ -162,7 +166,7 @@ function checkServiceCredentials() {
 
     if (!naturalLanguageUnderstanding) {
       errors.push(strings.NLU_PROBLEM);
-    }    
+    }
   }
   return errors;
 }
