@@ -11,10 +11,10 @@
       <div class="container is-fluid">
         <% if (msg.errors) { %>
         <div class="content">
-          <h1 style="color: red">Errors:</h1>
+          <h1 style="color: orange">Errors:</h1>
           <ol type="1">
             <% msg.errors.forEach(function(error){ %>
-            <li style="color: red"><%= error %></li>
+            <li style="color: orange"><%= error %></li>
             <%});%>
           </ol>
         </div>
