@@ -25,11 +25,11 @@
         <div class="tile is-ancestor">
           <div class="tile is-parent">
               <% if(review.doc.sentiment === 'positive') {%>
-                <article class="tile is-child box notification is-primary">
+                <article class="tile is-danger box notification is-primary">
               <% } else if(review.doc.sentiment === 'negative') {%>
-                <article class="tile is-child box notification is-warning">
+                <article class="tile is-danger box notification is-warning">
               <% } else { %>
-                <article class="tile is-child box">
+                <article class="tile is-danger box">
               <% } %>
               <p class="title"><%= review.doc.movie %></p>
               <p class="subtitle">
