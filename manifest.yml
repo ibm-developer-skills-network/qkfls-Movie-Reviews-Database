@@ -2,4 +2,4 @@
 applications:
  - name: movies-reviews-database-1a3
    random-route: true
-   memory: 128M
+   memory: 256M
