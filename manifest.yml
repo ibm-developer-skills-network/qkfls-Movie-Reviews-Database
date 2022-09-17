@@ -1,5 +1,6 @@
 ---
 applications:
- - name: movies-reviews-database
-   random-route: false
+ - name: movies-reviews-database-882
+   buildpack: nodejs_buildpack
+   random-route: true
    memory: 128M
