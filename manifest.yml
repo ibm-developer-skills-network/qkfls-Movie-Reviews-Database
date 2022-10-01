@@ -1,4 +1,5 @@
 ---
 applications:
  - name: movies-reviews-database-c02
- 
+   random-route: false
+   memory: 128M
