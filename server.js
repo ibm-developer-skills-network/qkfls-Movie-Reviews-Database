@@ -2,12 +2,10 @@ const express = require("express");
 const app = express();
 const bodyParser = require('body-parser')
 require('dotenv').config()
-const strings = require("./utils/strings.json");
+const strings = require("/app/utils/strings.json");
 const { CloudantV1 } = require('@ibm-cloud/cloudant');
 const { BasicAuthenticator } = require('ibm-cloud-sdk-core');
 const uuid = require('uuid');
-
-const { randomInt } = require('crypto');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -140,7 +138,7 @@ app.post("/reviews", function (request, response) {
         console.log(JSON.stringify(analysisResults, null, 2));
 
         doc['sentiment'] = analysisResults.result.sentiment.document.label;
-        doc['_id'] = uuid.v4()+":"+randomInt(100),
+        doc['_id'] = uuid.v4()+":1",
         service.postDocument({
           db: dbName,
           document: doc
