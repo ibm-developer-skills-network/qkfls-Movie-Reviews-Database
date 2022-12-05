@@ -24,7 +24,8 @@
     "ibm-cloud-sdk-core": "^3.2.1",
     "ibm-watson": "^7.1.2",
     "nodemon": "^2.0.6",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "uuidv4": "^6.2.13"
   },
   "author": "IBM Corp",
   "license": "Apache-2.0"
