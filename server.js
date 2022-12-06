@@ -1,9 +1,11 @@
-var express = require("express");
-var app = express();
-var bodyParser = require('body-parser')
-const dotenv = require('dotenv').config()
-var cfenv = require("cfenv");
-var strings = require("./utils/strings.json");
+const express = require("express");
+const app = express();
+const bodyParser = require('body-parser')
+require('dotenv').config()
+const strings = require("/app/utils/strings.json");
+const { CloudantV1 } = require('@ibm-cloud/cloudant');
+const { BasicAuthenticator } = require('ibm-cloud-sdk-core');
+const uuid = require('uuid');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -14,52 +16,46 @@ app.use(bodyParser.json())
 let NLU_APIKEY, NLU_URL, CLOUDANT_URL, CLOUDANT_API;
 let moviesDb, naturalLanguageUnderstanding, cloudant;
 const dbName = 'movies-reviews';
+let service;
 
-if (dotenv.error) {
-  //Local file not found. Get creds from cloud services. 
-  console.log('dotenv not present, will load vcap on IBM Cloud!');
-  const appEnv = cfenv.getAppEnv();
-  console.log('outputting appEnv');
-  console.log(JSON.stringify(appEnv));
-  if (appEnv.services['cloudantNoSQLDB'] || appEnv.getService(/[Cc][Ll][Oo][Uu][Dd][Aa][Nn][Tt]/)) {
-    // Load the Cloudant library.
-    Cloudant = require('@cloudant/cloudant');
+//load from local .env file
+console.log('local env file found')
+NLU_APIKEY = process.env.NLU_APIKEY;
+NLU_URL = process.env.NLU_URL;
+CLOUDANT_URL = process.env.CLOUDANT_URL;
+CLOUDANT_USERNAME = process.env.CLOUDANT_USERNAME;
+CLOUDANT_PASSWORD = process.env.CLOUDANT_PASSWORD;
 
-    const cloudantCreds = appEnv.services['cloudantNoSQLDB'][0].credentials;
-    CLOUDANT_API = cloudantCreds.apikey;
-    CLOUDANT_URL = cloudantCreds.url;
-  }
-  if (appEnv.services['natural-language-understanding']) {
-    nluCreds = appEnv.services['natural-language-understanding'][0].credentials;
-    NLU_APIKEY = nluCreds.apikey;
-    NLU_URL = nluCreds.url;
-  }
-} else {
-  //load from local .env file
-  console.log('local env file found')
-  NLU_APIKEY = process.env.NLU_APIKEY;
-  NLU_URL = process.env.NLU_URL;
-  CLOUDANT_API = process.env.CLOUDANT_API;
-  CLOUDANT_URL = process.env.CLOUDANT_URL;
-}
 
-// logging variables for debug purposes:
-// console.log(`NLU_APIKEY: ${NLU_APIKEY}`);
-// console.log(`NLU_URL: ${NLU_URL}`);
-// console.log(`CLOUDANT_API: ${CLOUDANT_API}`);
-// console.log(`CLOUDANT_URL: ${CLOUDANT_URL}`);
-
-if (CLOUDANT_API && CLOUDANT_URL) {
-  var Cloudant = require('@cloudant/cloudant');
-  // use IAM here
-  cloudant = Cloudant({ url: CLOUDANT_URL, plugins: { iamauth: { iamApiKey: CLOUDANT_API } } });
-  // Create a new "moviesDb" database.
-  cloudant.db.create(dbName, function (err, data) {
-    if (!err) //err if database doesn't already exists
-      console.log("Created database: " + dbName);
+function initDB() {
+  const authenticator = new BasicAuthenticator({
+      username: process.env.CLOUDANT_USERNAME,
+      password: process.env.CLOUDANT_PASSWORD
   });
-  moviesDb = cloudant.db.use(dbName);
+
+    service = new CloudantV1({
+    authenticator: authenticator
+});
+
+service.setServiceUrl(process.env.CLOUDANT_URL);
 }
+
+if (CLOUDANT_USERNAME && CLOUDANT_PASSWORD && CLOUDANT_URL) {
+  initDB();
+  // Create a new "moviesDb" database.
+
+  service.getAllDbs().then(response => {
+    if(!response.result.includes(dbName)) {
+      console.log(dbName+" doesn't exist. Creating it.");
+    service.putDatabase({
+        db: dbName,
+        partitioned: true
+      }).then(response => {
+        console.log(response.result);
+      });    
+    }
+  });
+} 
 
 if (NLU_APIKEY && NLU_URL) {
   const NaturalLanguageUnderstandingV1 = require('ibm-watson/natural-language-understanding/v1');
@@ -88,31 +84,31 @@ app.get('/', function (req, res, next) {
 // user is on the reviews page
 app.get("/reviews", function (request, response) {
   // get all the cloudant data and display the result
-  var reviews = [];
-  var errors = checkServiceCredentials();
-
+  let errors = checkServiceCredentials();
   if (errors && errors.length > 0) {
     response.render('reviews.ejs', { msg: { errors: errors } })
   } else {
-    moviesDb.list({ include_docs: true }, function (err, body) {
-      if (err) {
-        response.render('reviews.ejs', { msg: { errors: [strings.CLOUDANT_ERROR + " " + err.message] } })
-      } else {
-        response.render('reviews.ejs', { msg: { result: body.rows } });
-      }
-    })
+    service.postAllDocs({
+      db: dbName,
+      includeDocs: true,
+      limit: 10
+    }).then(res => {
+        response.render('reviews.ejs', { msg: { result: res.result.rows } });
+    }).catch((err)=>{
+      response.render('reviews.ejs', { msg: { errors: [strings.CLOUDANT_ERROR + " " + err.message] } })
+    });
   }
 });
 
 // user posted a review
 app.post("/reviews", function (request, response) {
 
-  var errors = checkServiceCredentials();
+  let errors = checkServiceCredentials();
 
-  var firstName = request.body.first_name;
-  var lastName = request.body.last_name;
-  var review = request.body.review;
-  var movie = request.body.movie;
+  let firstName = request.body.first_name;
+  let lastName = request.body.last_name;
+  let review = request.body.review;
+  let movie = request.body.movie;
 
   if (!firstName || !lastName || !review || !movie) {
     errors.push(strings.INVALID_FORM);
@@ -122,7 +118,7 @@ app.post("/reviews", function (request, response) {
     response.render('reviews.ejs', { msg: { errors: errors } })
   } else {
 
-    var doc = {
+    let doc = {
       "firstName": firstName,
       "lastName": lastName,
       "movie": movie,
@@ -140,14 +136,16 @@ app.post("/reviews", function (request, response) {
     naturalLanguageUnderstanding.analyze(analyzeParams)
       .then(analysisResults => {
         console.log(JSON.stringify(analysisResults, null, 2));
+
         doc['sentiment'] = analysisResults.result.sentiment.document.label;
-        moviesDb.insert(doc, function (err, body, header) {
-          if (err) {
-            console.log('[moviesDb.insert] ', err.message);
-            return;
-          }
-          response.redirect('/reviews');
+        doc['_id'] = uuid.v4()+":1",
+        service.postDocument({
+          db: dbName,
+          document: doc
+        }).then(response => {
+          console.log(response.result);
         });
+        response.redirect('/reviews');
       })
       .catch(err => {
         console.log('error:', err);
@@ -157,17 +155,14 @@ app.post("/reviews", function (request, response) {
 });
 
 function checkServiceCredentials() {
-  var errors = [];
-  if (!cloudant || !moviesDb || !naturalLanguageUnderstanding) {
-
-    if (!cloudant || !moviesDb) {
+  let errors = [];
+    if (!service) {
       errors.push(strings.CLOUDANT_PROBLEM);
     }
 
     if (!naturalLanguageUnderstanding) {
       errors.push(strings.NLU_PROBLEM);
     }
-  }
   return errors;
 }
 
@@ -175,7 +170,7 @@ app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 app.use(express.static(__dirname + '/views'));
 
-var port = process.env.PORT || 8080
+let port = process.env.PORT || 8080
 app.listen(port, function () {
   console.log("To view your app, open this link in your browser: http://localhost:" + port);
 });

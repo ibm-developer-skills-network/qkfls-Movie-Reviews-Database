@@ -5,7 +5,8 @@
   "version": "0.1.1",
   "private": false,
   "engines": {
-    "node": "16.15.1"
+    "node": "18.12.1",
+    "npm": "9.1.3"
   },
   "scripts": {
     "start": "node server.js"
@@ -15,14 +16,16 @@
     "url": "https://github.com/IBM-Cloud/get-started-node"
   },
   "dependencies": {
-    "@cloudant/cloudant": "^3.0.2",
+    "@ibm-cloud/cloudant": "^0.3.1",
     "body-parser": "^1.17.x",
-    "cfenv": "^1.2.3",
     "dotenv": "^4.0.0",
     "ejs": "^3.1.5",
     "express": "^4.15.x",
-    "ibm-watson": "^5.7.1",
-    "nodemon": "^2.0.6"
+    "ibm-cloud-sdk-core": "^3.2.1",
+    "ibm-watson": "^7.1.2",
+    "nodemon": "^2.0.6",
+    "uuid": "^9.0.0",
+    "uuidv4": "^6.2.13"
   },
   "author": "IBM Corp",
   "license": "Apache-2.0"
