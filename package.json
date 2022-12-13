@@ -20,7 +20,7 @@
     "body-parser": "^1.17.x",
     "dotenv": "^4.0.0",
     "ejs": "^3.1.5",
-    "express": "^4.15.x",
+    "express": "^4.17.x",
     "ibm-cloud-sdk-core": "^3.2.1",
     "ibm-watson": "^7.1.2",
     "nodemon": "^2.0.6",
