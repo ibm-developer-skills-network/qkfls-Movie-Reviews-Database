@@ -8,7 +8,7 @@ ADD server.js /app
 ADD .env* /app
 ADD utils/strings.json /app/utils/
 
-RUN cd /app; npm install; npm audit fix --force
+RUN cd /app; npm install
 
 ENV NODE_ENV production
 ENV PORT 8080
