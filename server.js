@@ -18,7 +18,7 @@ let moviesDb, naturalLanguageUnderstanding, cloudant;
 const dbName = 'movies-reviews';
 let service;
 
-//load from local .env file
+//load from local .env file.
 console.log('local env file found')
 NLU_APIKEY = process.env.NLU_APIKEY;
 NLU_URL = process.env.NLU_URL;
