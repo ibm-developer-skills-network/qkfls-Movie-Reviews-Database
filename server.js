@@ -10,7 +10,7 @@ const uuid = require('uuid');
 // parse application/x-www-form-urlencoded 
 app.use(bodyParser.urlencoded({ extended: false }))
 
-// parse application/json
+// parse application/json 
 app.use(bodyParser.json())
 
 let NLU_APIKEY, NLU_URL, CLOUDANT_URL, CLOUDANT_API;
